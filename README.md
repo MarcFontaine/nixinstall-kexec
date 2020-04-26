@@ -1,0 +1,1 @@
+# Install nixos via kexec
