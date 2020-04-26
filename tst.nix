@@ -1,0 +1,21 @@
+# new cmd: nix-build '<nixpkgs/nixos>' -A config.system.build.kexec_tarball -I nixos-config=./configuration.nix -Q -j 4
+
+{ lib, pkgs, config, ... }:
+
+with lib;
+
+{
+  imports = [ <nixpkgs/nixos/modules/installer/netboot/netboot-minimal.nix> ./autoreboot.nix ./kexec.nix ./justdoit.nix ];
+
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.loader.grub.enable = false;
+  boot.kernelParams = [
+    "console=ttyS0,115200"          # allows certain forms of remote access, if the hardware is setup right
+    "panic=30" "boot.panic_on_fail" # reboot the machine upon fatal boot issues
+  ];
+  systemd.services.sshd.wantedBy = mkForce [ "multi-user.target" ];
+  networking.hostName = "kexec";
+  # example way to embed an ssh pubkey into the tar
+  users.users.root.openssh.authorizedKeys.keys = [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDVGGe2Y2+zrzCa3BiFVaCH9RzoMmsBHR+/xCL2eBanYkukLz8V6a9FsjYhtirlwXMojcxWQSHif5YKw1doAc6lMYUxkEU6IgNIN/hAzPOR9C6c0EktFDjiMMJ0C0QlFxumcPHiAMIltosF0Lkcr0jG+0KLt1UqLP48Ib1Zp3QLSYf9DziAoG0OUTx8yjq3kBvfpFboQPIdqhoc5bvKwIRhZoKDDKmdZajtN0Fq0CWeBV9HYyW7dWrqQh/uUTbP4PX3bAlid87xkJpJlwafZVdKb48Ktcic6AcByy5v/6bOMTTcpxWowQyUhRhdUdlCLHhx1e9ojwkoHz6jX3AsB/4uPu2skb9u3vGa4HvRrKOvZgVAFzVlHOJHxRjG9qHXom7vOuEqDKpX+tpfpQ+nu+QLSU+Js+bipCjBipVNVdM0WDgP1wVvMlPUX4zGKIszLDZH9iMDek3Clu3G6odygVlViJWOJ1q+VItFGUqYR2KpA5OuC4Px/dle9bEHo80JunvuGc8XXvgGAWGCC8jQqUsXwzXjmWHifxevB1p2c2zFSyWgvhUc+0ftWaYwZa+uAMg21Fb+VpFQSL7/Vl8t1ZPmipKgz0o0SQ9JjS1s9pvb2jlPb8N7qeX2O6rQxsqdmkhOKtqbB1QvFjzsj8QhUMfLdw4XmSl/moLyi5bq+Oo7Rw== cardno:000611300226"];
+
+}
