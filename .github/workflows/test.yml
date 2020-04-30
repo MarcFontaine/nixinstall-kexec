@@ -2,6 +2,8 @@ name: "nixinstall-kexec"
 on:
   pull_request:
   push:
+    tags:
+    - 'v*'
 jobs:
   build:
     name: "build-nix-install-script"
@@ -23,8 +25,8 @@ jobs:
          # This token is provided by Actions, you do not need to create your own token
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.sha }}
-        release_name: Release ${{ github.sha }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         body: |
               NIX install script Release
         draft: false
