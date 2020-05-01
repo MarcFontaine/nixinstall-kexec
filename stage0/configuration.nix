@@ -1,5 +1,3 @@
-# new cmd: nix-build '<nixpkgs/nixos>' -A config.system.build.kexec_tarball -I nixos-config=./configuration.nix -Q -j 4
-
 { lib, pkgs, config, ... }:
 with lib;
 {
