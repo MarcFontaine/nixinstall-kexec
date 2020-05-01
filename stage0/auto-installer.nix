@@ -8,5 +8,6 @@ in
     stage1.greeting
     stage1.auto-install
   ];
-  systemd.services.greeter = stage1.greeter-service;
+  systemd.services.auto-install = stage1.auto-install;
+  #  systemd.services.greeter = stage1.greeter-service;
 }
