@@ -1,0 +1,8 @@
+#cloud-config
+runcmd:
+  - 'cd /'
+  - 'wget https://github.com/MarcFontaine/nixinstall-kexec/releases/download/v0.2/nixos-system-x86_64-linux.tar.xz'
+  - 'xzcat nixos-system-x86_64-linux.tar.xz | tar -xvf -'
+  - '/kexec_nixos'
+
+

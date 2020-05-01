@@ -16,7 +16,8 @@ greeting = pkgs.writeScriptBin "greeting" ''
     #!${pkgs.stdenv.shell}
     echo "Hello NIXINSTALL"
 '';
-  
+
+##geht nicht wegen sandbox!
 hetzner-config = pkgs.runCommand "hetzner-config" {} ''
     #!${pkgs.stdenv.shell}
     mkdir -p "$out"
@@ -27,14 +28,16 @@ hetzner-config = pkgs.runCommand "hetzner-config" {} ''
 auto-install = pkgs.writeScriptBin "auto-install" ''
     #!${pkgs.stdenv.shell}
     set -e
-    parted /dev/sda -- mklabel msdos
-    parted /dev/sda -- mkpart primary 1MiB ~512MB
-    parted /dev/sda -- mkpart primary linux-swap -512MB 100%
+    parted -s /dev/sda \
+       mklabel msdos \
+       mkpart primary 1MiB 100%
+    #       mkpart primary linux-swap ~512MB 100%
     mkfs.ext4 -L nixos /dev/sda1
-    mkswap -L swap /dev/sda2
-    mount /dev/disk/by-label/nixos /mnt
-    swapon /dev/sda2
-    cp ${setup-utils}/lib/setup-utils/target-config.nix /mnt/etc/configuration.nix
+    #    mkswap -L swap /dev/sda2
+    mount /dev/sda1 /mnt
+    #    swapon /dev/sda2
+    nixos-generate-config --root /mnt
+    cp ${setup-utils}/lib/setup-utils/target-config.nix /mnt/etc/nixos/configuration.nix
     nixos-install --no-root-passwd
 '';
 
@@ -43,8 +46,9 @@ greeter-service = {
     after = [ "network.target" ];
     description = "auto install NIXOS on HD";
     serviceConfig = {
-        ExecStart = ''${greeting}/bin/greeting'';
+      StandardOutput = "journal+console";
+      StandardError  = "journal+console";
+      ExecStart = ''${greeting}/bin/greeting'';
     };
 };
-
 }
