@@ -5,9 +5,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     stage1.setup-utils
-    stage1.greeting
     stage1.auto-install
   ];
-  systemd.services.auto-install = stage1.auto-install;
-  #  systemd.services.greeter = stage1.greeter-service;
+  systemd.services.auto-install = stage1.auto-install-service;
 }

@@ -13,10 +13,16 @@ setup-utils = pkgs.runCommand "setup-utils" {} ''
     cp hetzner-config.nix $out/lib/setup-utils/
 '';
 
-greeting = pkgs.writeScriptBin "greeting" ''
-    #!${pkgs.stdenv.shell}
-    echo "Hello NIXINSTALL"
-'';
+auto-install-service = {
+    wantedBy = [ "multi-user.target" ]; 
+    after = [ "network.target" ];
+    description = "Auto install NIXOS on HD";
+    serviceConfig = {
+      StandardOutput = "journal+console";
+      StandardError  = "journal+console";
+      ExecStart = ''${auto-install}/bin/auto-install'';
+    };
+};
 
 auto-install = pkgs.writeScriptBin "auto-install" ''
     #!${pkgs.stdenv.shell}
@@ -35,30 +41,12 @@ auto-install = pkgs.writeScriptBin "auto-install" ''
     reboot
 '';
 
-greeter-service = {
-    wantedBy = [ "multi-user.target" ]; 
-    after = [ "network.target" ];
-    description = "auto install NIXOS on HD";
-    serviceConfig = {
-      StandardOutput = "journal+console";
-      StandardError  = "journal+console";
-      ExecStart = ''${auto-install}/bin/auto-install'';
-    };
-};
-
-
 #geht nicht wegen sandbox!
 hetzner-config = pkgs.runCommand "hetzner-config" {} ''
     #!${pkgs.stdenv.shell}
     mkdir -p "$out"
     cd $out
     ${pkgs.curl}/bin/curl http://169.254.169.254/hetzner/v1/metadata
-'';
-
-pkgs.writeScriptBin = pkgs.runCommand "fetch-config" {} ''
-    #!${pkgs.stdenv.shell}
-    cd $1
-#    ${pkgs.curl}/bin/curl http://169.254.169.254/hetzner/v1/metadata > metadata
 '';
 
 }
