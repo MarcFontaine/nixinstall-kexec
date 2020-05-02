@@ -1,9 +1,22 @@
 #cloud-config
 #
-runcmd:
-  - 'cd /'
-  - 'wget https://github.com/MarcFontaine/nixinstall-kexec/releases/latest/download/nixos-system-x86_64-linux.tar.xz >/dev/tty0'
-  - 'xzcat nixos-system-x86_64-linux.tar.xz | tar -xvf - >/dev/tty0'
-  - '/kexec_nixos >/dev/tty0'
+write_files:
+- content: |
+      #!/usr/bin/env bash
+      pkg="https://github.com/MarcFontaine/nixinstall-kexec/releases/latest/download/nixos-system-x86_64-linux.tar.xz"
+      cd /
+      curl -L "$pkg" | xzcat | tar -xvf -
+      /kexec_nixos
+  path: /install.sh
+  owner: root:root
+  permissions: '0500'
+#
+- content: |
+      { ... }:{
+        imports = [ ./hetzner-configuration.nix ];
+      }
+  path: /configuration.nix
 
+-runcmd:
+- /install.sh
 
