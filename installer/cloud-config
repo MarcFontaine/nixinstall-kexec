@@ -15,7 +15,7 @@ write_files:
       { ... }:{
         imports = [ ./hetzner-configuration.nix ];
       }
-  path: /configuration.nix
+  path: /installer/configuration.nix
 
 -runcmd:
 - /install.sh
