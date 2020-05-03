@@ -15,6 +15,7 @@ jobs:
       with:
         name: nixinstall-kexec
         signingKey: '${{ secrets.CACHIX_SIGNING_KEY }}'
+        skipPush: true
         # Only needed for private caches
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - run: nix-build
