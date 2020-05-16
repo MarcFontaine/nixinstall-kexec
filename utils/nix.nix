@@ -31,10 +31,11 @@ auto-install = pkgs.writeScriptBin "auto-install" ''
     set -e
     source /installer/create-filesystems.sh
 
-    cp -avr /installer /mnt/installer
+    cp -avr /installer /mnt/installer    
     mkdir /mnt/etc
     ln -s -r  /mnt/installer /mnt/etc/nixos
     nixos-generate-config --root /mnt --show-hardware-config > /mnt/installer/hardware-configuration.nix
+    ${getHetznerMetaData}/bin/getHetznerMetaData > /mnt/installer/hetzner-metadata.json
 
     # check syntax and fallback !
     # cp .. /mnt/etc/nixos/configuration.nix
@@ -47,4 +48,9 @@ auto-install = pkgs.writeScriptBin "auto-install" ''
     echo "finished installing NIXOS"
     shutdown -r now
 '';
+
+getHetznerMetaData = pkgs.writeScriptBin "getHetznerMetaData" ''
+    #!${pkgs.bash}/bin/bash
+    ${pkgs.curl}/bin/curl http://169.254.169.254/hetzner/v1/metadata | ${pkgs.yaml2json}/bin/yaml2json
+    '';
 }
