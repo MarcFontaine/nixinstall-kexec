@@ -1,11 +1,12 @@
 #cloud-config
 #
+# output: { all: "| tee -a /var/log/cloud-init-output.log /dev/console" }
 write_files:
 - content: |
       #!/usr/bin/env bash
       pkg="https://github.com/MarcFontaine/nixinstall-kexec/releases/latest/download/nixos-system-x86_64-linux.tar.xz"
       cd /
-      curl -L "$pkg" | xzcat | tar -xvf -
+      curl -L "$pkg" | xzcat | tar --keep-old-files -xvf -
       /kexec_nixos
   path: /install.sh
   owner: root:root
@@ -16,7 +17,7 @@ write_files:
         imports = [ ./hetzner-configuration.nix ];
       }
   path: /installer/configuration.nix
-
--runcmd:
+#
+runcmd:
 - /install.sh
 

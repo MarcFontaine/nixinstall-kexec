@@ -23,6 +23,8 @@
   ];
 
   services.openssh.enable = true;
+  # services.openssh.permitRootLogin = "yes";
+  # users.users.root.password = "geheim1234";
   systemd.services.sshd.wantedBy = lib.mkForce [ "multi-user.target" ];
 #  networking.hostName = "nixos";
 }
